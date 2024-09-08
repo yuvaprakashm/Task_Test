@@ -1,6 +1,7 @@
 package net.texala.employee.web.rest;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -33,20 +34,17 @@ public class EmployeeController {
 
     @GetMapping
     public ResponseEntity<List<Employee>> getAllEmployees() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return ResponseEntity.ok(employees);
+        return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable int id) {
-        Employee employee = employeeService.getEmployeeById(id);
-        return ResponseEntity.ok(employee);
+    public ResponseEntity<Optional<Employee>> getEmployeeById(@PathVariable int id) {
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @PostMapping
     public ResponseEntity<String> addEmployee(@Valid @RequestBody EmployeeVo employeeVo) {
-        Employee employee = employeeMapper.convertToEntity(employeeVo);
-        employeeService.addEmployee(employee);
+        employeeService.addEmployee(employeeMapper.convertToEntity(employeeVo));
         return ResponseEntity.status(HttpStatus.CREATED).body("Employee added successfully");
     }
 

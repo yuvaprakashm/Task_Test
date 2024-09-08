@@ -2,12 +2,14 @@ package net.texala.employee.service.impl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	private List<Employee> readEmployeesFromCsv() {
 		List<Employee> employees = new ArrayList<>();
+		File file = new File(CSV_FILE);
+        if (!file.exists()) {
+            System.err.println("CSV file not found.");
+            return employees;
+        }
 		try (BufferedReader br = new BufferedReader(new FileReader(CSV_FILE))) {
 			String line;
 
@@ -59,10 +66,10 @@ public class EmployeeServiceImpl implements EmployeeService {
  
 
 	@Override
-	public Employee getEmployeeById(int id) {
+	public Optional<Employee> getEmployeeById(int id) {
 	    for (Employee emp : readEmployeesFromCsv()) {
 	        if (emp.getId() == id) {
-	            return emp;
+	            return Optional.of(emp);
 	        }
 	    }
 	    throw new NoSuchElementException("ID not found: " + id);
@@ -70,7 +77,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
 	@Override
-	public void addEmployee(Employee employee) {
+	public Employee addEmployee(Employee employee) {
 		List<Employee> employees = readEmployeesFromCsv();
 		for (Employee emp : employees) {
 			if (emp.getId() == employee.getId() || emp.getEmail().equals(employee.getEmail())) {
@@ -79,10 +86,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 		employees.add(employee);
 		writeToCsv(employees);
+		return employee;
 	}
 
 	@Override
-	public void updateEmployee(Employee employee) {
+	public Employee updateEmployee(Employee employee) {
 		List<Employee> employees = readEmployeesFromCsv();
 		boolean found = false;
 		for (int i = 0; i < employees.size(); i++) {
@@ -103,14 +111,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 				break;
 			}
 		}
-		if (!found) {
+		if (found) {
+			writeToCsv(employees);
+			return employee;
+		}else {
 			throw new RuntimeException("Employee not found.");
+
 		}
-		writeToCsv(employees);
+		
 	}
 
 	@Override
-	public void deleteEmployee(int id) {
+	public boolean deleteEmployee(int id) {
 		List<Employee> employees = readEmployeesFromCsv();
 		boolean removed = false;
 		for (int i = 0; i < employees.size(); i++) {
@@ -123,6 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 		if (removed) {
 			writeToCsv(employees);
+			return true;
 		} else {
 			throw new RuntimeException("Employee Data not found");
 		}
