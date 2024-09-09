@@ -7,16 +7,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-@Getter
-@Setter
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeVo {
-	
-	@NotNull(message = "ID is required")   
+
+	@NotNull(message = "ID is required")
 	@Min(value = 1, message = "ID must be a positive number")
 	private int id;
 
@@ -30,7 +29,7 @@ public class EmployeeVo {
 
 	@NotNull(message = "Salary must not be null")
 	@Min(value = 0, message = "Salary must be non-negative")
-	private int salary;
+	private double salary;
 
 	@NotNull(message = "Date of birth is required")
 	@Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{4}$", message = "Dob must be in valid format(dd-mm-yyyy)")

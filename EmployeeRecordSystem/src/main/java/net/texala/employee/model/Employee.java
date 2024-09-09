@@ -13,7 +13,7 @@ public class Employee {
 
 	private String email;
 
-	private int salary;
+	private double salary;
 
 	private String dob;
 

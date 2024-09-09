@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 
 import net.texala.employee.model.Employee;
 import net.texala.employee.service.EmployeeService;
+import net.texala.employee.vo.EmployeeVo;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
 	private static final String CSV_FILE = "D:/employees.csv";
 	
-	private static final String CSV_HEADER = "ID,Name,Email,Salary,DOB";
+	private static final String CSV_HEADER = "ID,Name, Email,       Salary,    DOB";
 
 
 	@Override
@@ -50,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 						emp.setId(Integer.parseInt(data[0].trim()));
 						emp.setName(data[1].trim());
 						emp.setEmail(data[2].trim());
-						emp.setSalary(Integer.parseInt(data[3].trim()));
+						emp.setSalary(Double.parseDouble(data[3].trim()));
 						emp.setDob(data[4].trim());
 						employees.add(emp);
 					} catch (NumberFormatException e) {
@@ -77,43 +78,51 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
 	@Override
-	public Employee addEmployee(Employee employee) {
-		List<Employee> employees = readEmployeesFromCsv();
-		for (Employee emp : employees) {
-			if (emp.getId() == employee.getId() || emp.getEmail().equals(employee.getEmail())) {
-				throw new RuntimeException("Employee with ID or Email already exists.");
-			}
-		}
-		employees.add(employee);
-		writeToCsv(employees);
-		return employee;
+	public EmployeeVo addEmployee(EmployeeVo employeeVo) {
+	    List<Employee> employees = readEmployeesFromCsv();
+	    for (Employee emp : employees) {
+	        if (emp.getId() == employeeVo.getId() || emp.getEmail().equals(employeeVo.getEmail())) {
+	            throw new RuntimeException("Employee with ID or Email already exists.");
+	        }
+	    }
+	    Employee newEmployee = new Employee();
+	    newEmployee.setId(employeeVo.getId());
+	    newEmployee.setName(employeeVo.getName());
+	    newEmployee.setEmail(employeeVo.getEmail());
+	    newEmployee.setSalary(employeeVo.getSalary());
+	    newEmployee.setDob(employeeVo.getDob());
+
+	    employees.add(newEmployee);
+	    writeToCsv(employees);
+	    return employeeVo;
 	}
 
+
 	@Override
-	public Employee updateEmployee(Employee employee) {
+	public EmployeeVo updateEmployee(EmployeeVo employeeVo) {
 		List<Employee> employees = readEmployeesFromCsv();
 		boolean found = false;
 		for (int i = 0; i < employees.size(); i++) {
 			Employee emp = employees.get(i);
-			if (emp.getId() == employee.getId()) {
-				if (!emp.getEmail().equals(employee.getEmail())) {
+			if (emp.getId() == employeeVo.getId()) {
+				if (!emp.getEmail().equals(employeeVo.getEmail())) {
 					for (Employee e : employees) {
-						if (e.getEmail().equals(employee.getEmail())) {
+						if (e.getEmail().equals(employeeVo.getEmail())) {
 							throw new RuntimeException("Email already exists.");
 						}
 					}
 				}
-				emp.setName(employee.getName());
-				emp.setEmail(employee.getEmail());
-				emp.setSalary(employee.getSalary());
-				emp.setDob(employee.getDob());
+				emp.setName(employeeVo.getName());
+				emp.setEmail(employeeVo.getEmail());
+				emp.setSalary(employeeVo.getSalary());
+				emp.setDob(employeeVo.getDob());
 				found = true;
 				break;
 			}
 		}
 		if (found) {
 			writeToCsv(employees);
-			return employee;
+			return employeeVo;
 		}else {
 			throw new RuntimeException("Employee not found.");
 
@@ -137,7 +146,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			writeToCsv(employees);
 			return true;
 		} else {
-			throw new RuntimeException("Employee Data not found");
+			throw new RuntimeException("Employee not found");
 		}
 	}
 
@@ -146,8 +155,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			bw.write(CSV_HEADER);
 			bw.newLine();
 			for (Employee emp : employees) {
-				String line = emp.getId() + "," + emp.getName() + "," + emp.getEmail() + "," + emp.getSalary() + ","
-						+ emp.getDob();
+				String line = emp.getId() + "," + emp.getName() + "," + emp.getEmail() + "," + emp.getSalary() + "," + emp.getDob();
 				bw.write(line);
 				bw.newLine();
 			}
@@ -156,5 +164,4 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 
 	}
-
 }
