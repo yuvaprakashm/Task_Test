@@ -7,14 +7,10 @@ import lombok.Setter;
 @Setter
 public class Employee {
 
-	private int id;
-
+	private Long id;
 	private String name;
-
 	private String email;
-
 	private double salary;
-
 	private String dob;
 
 }

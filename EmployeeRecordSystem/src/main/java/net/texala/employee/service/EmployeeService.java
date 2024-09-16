@@ -1,20 +1,20 @@
 package net.texala.employee.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import net.texala.employee.model.Employee;
 import net.texala.employee.vo.EmployeeVo;
 
 public interface EmployeeService {
 
-	public List<Employee> getAllEmployees();
+	public List<Employee> findAll();
 
-	public Optional<Employee> getEmployeeById(int id);
+	public Employee findById(Long id);
 
-	public EmployeeVo addEmployee(EmployeeVo employeeVo);
+	public EmployeeVo add(EmployeeVo employeeVo);
 
-	public EmployeeVo updateEmployee(EmployeeVo employeeVo);
+	public EmployeeVo update(EmployeeVo employeeVo);
 
-	public boolean deleteEmployee(int id);
+	public boolean delete(Long id);
+
 }

@@ -17,7 +17,7 @@ public class EmployeeVo {
 
 	@NotNull(message = "ID is required")
 	@Min(value = 1, message = "ID must be a positive number")
-	private int id;
+	private Long id;
 
 	@NotBlank(message = "Name is Required")
 	@Pattern(regexp = "^[a-zA-Z]+$", message = "Name should contain only characters")
