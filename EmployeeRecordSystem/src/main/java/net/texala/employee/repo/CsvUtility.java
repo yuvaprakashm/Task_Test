@@ -16,12 +16,11 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
 
+import net.texala.employee.exception.Exception.ServiceException;
 import net.texala.employee.model.Employee;
 
-@Repository
-public class EmployeeRepository {
+public class CsvUtility {
 
 	@Value("${file.path}")
 	private String filePath;
@@ -48,12 +47,12 @@ public class EmployeeRepository {
 	}
 
 	public  void add(Employee employee) {
-		if (findById(employee.getId()).isPresent()) {
-			throw new RuntimeException("Employee with ID '" + employee.getId() + "' already exists.");
-		}
-		if (findByEmail(employee.getEmail()).isPresent()) {
-			throw new RuntimeException("Email '" + employee.getEmail() + "' already exists.");
-		}
+//		if (findById(employee.getId()).isPresent()) {
+//			throw new ServiceException("Employee with ID '" + employee.getId() + "' already exists.");
+//		}
+//		if (findByEmail(employee.getEmail()).isPresent()) {
+//			throw new ServiceException("Email '" + employee.getEmail() + "' already exists.");
+//		}
 		employeeCache.add(employee);
 		writeToCsv(employeeCache);
 	}
@@ -61,11 +60,11 @@ public class EmployeeRepository {
 	public void update(Employee employee) {
 		Optional<Employee> existingEmployeeOpt = findById(employee.getId());
 		if (!existingEmployeeOpt.isPresent()) {
-			throw new RuntimeException("Employee with ID '" + employee.getId() + "' does not exist.");
+			throw new ServiceException("Employee with ID '" + employee.getId() + "' does not exist.");
 		}
 		Employee existingEmployee = existingEmployeeOpt.get();
 		if (findByEmail(employee.getEmail()).isPresent() && !existingEmployee.getEmail().equals(employee.getEmail())) {
-			throw new RuntimeException("Email '" + employee.getEmail() + "' already exists.");
+			throw new ServiceException("Email '" + employee.getEmail() + "' already exists.");
 		}
 		employeeCache.remove(existingEmployee);
 		employeeCache.add(employee);
@@ -74,7 +73,7 @@ public class EmployeeRepository {
 
 	public void delete(Long id) {
 		Employee employeeToRemove = findById(id)
-				.orElseThrow(() -> new RuntimeException("Employee with ID '" + id + "' not found."));
+				.orElseThrow(() -> new ServiceException("Employee with ID '" + id + "' not found."));
 		employeeCache.remove(employeeToRemove);
 		writeToCsv(employeeCache);
 	}
